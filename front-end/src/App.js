@@ -26,6 +26,26 @@ function App() {
     });
   };
 
+  const handleClickUpdate = (values) => {
+    Axios.put("http://localhost:3001/update", {
+      email: values.email,
+      password: values.password,
+      newPassword: values.newPassword,
+    }).then((response) => {
+      alert(response.data.msg);
+      console.log(response);
+    });
+  };
+
+  const handleClickDelete = (values) => {
+    Axios.delete("http://localhost:3001/delete", {
+      data: { email: values.email, password: values.password },
+    }).then((response) => {
+      alert(response.data.msg);
+      console.log(response);
+    });
+  };
+
   const validationLogin = yup.object().shape({
     email: yup.string().email("Não é um email").required("Este campo é obrigatório"),
     password: yup.string().min(8, "A senha deve ter 8 caracteres").required("Este campo é obrigatório"),
@@ -35,6 +55,17 @@ function App() {
     email: yup.string().email("Não é um email").required("Este campo é obrigatório"),
     password: yup.string().min(8, "A senha deve ter 8 caracteres").required("Este campo é obrigatório"),
     confirmPassword: yup.string().oneOf([yup.ref("password"), null], "As senhas não são iguais"),
+  });
+
+  const validationUpdate = yup.object().shape({
+    email: yup.string().email("Não é um email").required("Este campo é obrigatório"),
+    password: yup.string().min(8, "A senha deve ter 8 caracteres").required("Este campo é obrigatório"),
+    newPassword: yup.string().min(8, "A nova senha deve ter 8 caracteres").required("Este campo é obrigatório"),
+  });
+
+  const validationDelete = yup.object().shape({
+    email: yup.string().email("Não é um email").required("Este campo é obrigatório"),
+    password: yup.string().min(8, "A senha deve ter 8 caracteres").required("Este campo é obrigatório"),
   });
 
   return (
@@ -77,6 +108,38 @@ function App() {
 
         <button className="button" type="submit">Cadastrar</button>
 
+        </Form>
+      </Formik>
+      <h1>Atualizar</h1>
+      <Formik initialValues={{}} onSubmit={handleClickUpdate} validationSchema={validationUpdate}>
+        <Form className="update-form">
+          <div className="update-form-group">
+            <Field name="email" className="form-field" placeholder="Email" />
+            <ErrorMessage component="span" name="email" className="form-error" />
+          </div>
+          <div className="form-group">
+            <Field name="password" className="form-field" placeholder="Senha Atual" />
+            <ErrorMessage component="span" name="password" className="form-error" />
+          </div>
+          <div className="form-group">
+            <Field name="newPassword" className="form-field" placeholder="Nova Senha" />
+            <ErrorMessage component="span" name="newPassword" className="form-error" />
+          </div>
+          <button className="button" type="submit">Atualizar</button>
+        </Form>
+      </Formik>
+      <h1>Excluir</h1>
+      <Formik initialValues={{}} onSubmit={handleClickDelete} validationSchema={validationDelete}>
+        <Form className="delete-form">
+          <div className="delete-form-group">
+            <Field name="email" className="form-field" placeholder="Email" />
+            <ErrorMessage component="span" name="email" className="form-error" />
+          </div>
+          <div className="form-group">
+            <Field name="password" className="form-field" placeholder="Senha" />
+            <ErrorMessage component="span" name="password" className="form-error" />
+          </div>
+          <button className="button" type="submit">Excluir</button>
         </Form>
       </Formik>
       

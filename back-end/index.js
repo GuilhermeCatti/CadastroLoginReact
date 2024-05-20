@@ -84,6 +84,68 @@ app.post("/login", (req, res) => {
     });
 });
 
+//////////
+app.put("/update", (req, res) => {
+    const { email, password, newPassword } = req.body;
+  
+    db.query("SELECT * FROM clientes WHERE email = ?", [email], (err, result) => {
+      if (err) {
+        res.send(err);
+      }
+      if (result.length > 0) {
+        bcrypt.compare(password, result[0].password, (erro, isMatch) => {
+          if (erro) {
+            res.send(erro);
+          }
+          if (isMatch) {
+            bcrypt.hash(newPassword, saltRounds, (erroHash, hash) => {
+              db.query("UPDATE clientes SET password = ? WHERE email = ?", [hash, email], (error, response) => {
+                if (error) {
+                  res.send(error);
+                }
+                res.send({ msg: "Senha atualizada com sucesso" });
+              });
+            });
+          } else {
+            res.send({ msg: "Senha atual incorreta" });
+          }
+        });
+      } else {
+        res.send({ msg: "Conta não encontrada" });
+      }
+    });
+  });
+  
+  app.delete("/delete", (req, res) => {
+    const { email, password } = req.body;
+  
+    db.query("SELECT * FROM clientes WHERE email = ?", [email], (err, result) => {
+      if (err) {
+        res.send(err);
+      }
+      if (result.length > 0) {
+        bcrypt.compare(password, result[0].password, (erro, isMatch) => {
+          if (erro) {
+            res.send(erro);
+          }
+          if (isMatch) {
+            db.query("DELETE FROM clientes WHERE email = ?", [email], (error, response) => {
+              if (error) {
+                res.send(error);
+              }
+              res.send({ msg: "Conta excluída com sucesso" });
+            });
+          } else {
+            res.send({ msg: "Senha incorreta" });
+          }
+        });
+      } else {
+        res.send({ msg: "Conta não encontrada" });
+      }
+    });
+  });
+//////////
+
 app.listen(3001, () => {
     console.log("Rodando na porta 3001");
 });
